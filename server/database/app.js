@@ -58,35 +58,33 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
-  try {
-    const dealers = await Dealerships.find();
-    res.json(dealers);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching dealers' });
-  }
+    try{
+        const dealers = await Dealerships.find();
+        res.json(dealers);
+    } catch(error){
+        res.status(500).json({ error: 'Error fetching documents'});
+    }
 });
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
-  try {
-    const state = req.params.state.toLowerCase();
-    const dealers = await Dealerships.find({ state: { $regex: `^${state}$`, $options: 'i' } });
-    res.json(dealers);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching dealers' });
-  }
+    try{
+        const dealers = await Dealerships.find({state: req.params.state});
+        res.json(dealers);
+    } catch (err){
+        res.status(500).json({ error: 'Error fetching documents'});
+    }
 });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
-  try {
-    const dealer = await Dealerships.findOne({ id: req.params.id });
-    res.json(dealer);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching dealer' });
-  }
+    try{
+        const documents = await Dealerships.find({id: req.params.id});
+        res.json(documents);
+    } catch (err){
+        res.status(500).json({ error: 'Error fetching documents'});
+    }
 });
-
 
 //Express route to insert review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
