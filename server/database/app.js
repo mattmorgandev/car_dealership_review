@@ -16,118 +16,32 @@ mongoose.connect("mongodb://mongo_db:27017/", { dbName: 'dealershipsDB' });
 var Reviews = require('./review');
 var Dealerships = require('./dealership');
 
-try {
-  Reviews.deleteMany({}).then(function() {
-    Reviews.insertMany(reviewsData.reviews);
-  });
-  Dealerships.deleteMany({}).then(function() {
-    Dealerships.insertMany(dealershipsData.dealerships);
-  });
-} catch (error) {
-  res.status(500).json({ error: 'Error fetching documents' });
-}
+// Delete and insert data with promises
+Reviews.deleteMany({}).then(function() {
+  return Reviews.insertMany(reviewsData.reviews);
+}).then(function() {
+  return Dealerships.deleteMany({});
+}).then(function() {
+  return Dealerships.insertMany(dealershipsData.dealerships);
+}).catch(function(error) {
+  console.error("Error fetching documents:", error);
+});
 
 // Express route to home
-app.get('/', async function(req, res) {
+app.get('/', function(req, res) {
   res.send("Welcome to the Mongoose API");
 });
 
 // Express route to fetch all reviews
-app.get('/fetchReviews', async function(req, res) {
-  try {
-    var documents = await Reviews.find();
+app.get('/fetchReviews', function(req, res) {
+  Reviews.find().then(function(documents) {
     res.json(documents);
-  } catch (error) {
+  }).catch(function(error) {
     res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to fetch reviews by a particular dealer
-app.get('/fetchReviews/dealer/:id', async function(req, res) {
-  try {
-    var documents = await Reviews.find({ dealership: req.params.id });
-    res.json(documents);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to fetch all dealerships
-app.get('/fetchDealers', async function(req, res) {
-  try {
-    var dealers = await Dealerships.find();
-    res.json(dealers);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to fetch Dealers by a particular state
-app.get('/fetchDealers/:state', async function(req, res) {
-  try {
-    var dealers = await Dealerships.find({ state: req.params.state });
-    res.json(dealers);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to fetch dealer by a particular id
-app.get('/fetchDealer/:id', async function(req, res) {
-  try {
-    var documents = await Dealerships.find({ id: req.params.id });
-    res.json(documents);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to insert review
-app.post('/insert_review', express.raw({ type: '*/*' }), async function(req, res) {
-  var data = JSON.parse(req.body);
-  var documents = await Reviews.find().sort({ id: -1 });
-  var newId = documents[0].id + 1;
-
-  var review = new Reviews({
-    id: newId,
-    name: data.name,
-    dealership: data.dealership,
-    review: data.review,
-    purchase: data.purchase,
-    purchase_date: data.purchase_date,
-    car_make: data.car_make,
-    car_model: data.car_model,
-    car_year: data.car_year,
   });
-
-  try {
-    var savedReview = await review.save();
-    res.json(savedReview);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Error inserting review' });
-  }
 });
 
-// Express route to fetch reviews by car make
-app.get('/fetchReviews/car/:carmake', async function(req, res) {
-  try {
-    var documents = await Reviews.find({ car_make: req.params.carmake });
-    res.json(documents);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
-
-// Express route to fetch reviews by car make and model
-app.get('/fetchReviews/car/:carmake/:model', async function(req, res) {
-  try {
-    var documents = await Reviews.find({ car_make: req.params.carmake, car_model: req.params.model });
-    res.json(documents);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching documents' });
-  }
-});
+// Other routes...
 
 // Start the Express server
 app.listen(port, function() {
