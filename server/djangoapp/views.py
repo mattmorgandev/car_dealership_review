@@ -12,7 +12,7 @@ from .populate import initiate
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-# VIEWS
+
 def get_cars(request):
     count = CarMake.objects.filter().count()
     print(count)
