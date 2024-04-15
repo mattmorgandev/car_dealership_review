@@ -3,7 +3,7 @@ on:
   push:
     branches: [master, main, week5-finaldone]
   pull_request:
-    branches: [master, main]
+    branches: [master, main, week5-finaldone]
 jobs:
   lint_python:
     name: Lint Python Files
